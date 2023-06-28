@@ -25,11 +25,11 @@ export const tagSeperator = (tag) => {
   if (separatorIndex === -1) return ["", tag];
   const [tagType] = tag.match(/^[^:]*:\s*/gm);
   const [, tagValue] = tag.split(/^[^:]*:\s*/gm);
-  return [tagType.replace(":", ""), tagValue];
+  return [tagType.replace(":", "").trim(), tagValue.trim()];
 };
 
 export const getTagsObjectFromTagsString = (tags) => {
-  const tagsArray = tags.split(", ");
+  const tagsArray = tags.split(",");
   return tagsArray.length
     ? tagsArray.reduce((acc, tag) => {
         const [tagType, tagValue] = tagSeperator(tag);
