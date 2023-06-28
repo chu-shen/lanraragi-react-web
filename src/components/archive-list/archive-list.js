@@ -56,7 +56,7 @@ export const ArchiveList = ({
             {archives
               .slice(sliceToRender[0], secondSliceValue)
               .map((archive, idx) => {
-                const { arcid, title } = archive;
+                const { arcid, title, tags, isnew, pagecount } = archive;
                 const onInfoClick = () => {
                   dispatch(updateInfoDialogArchiveId(arcid));
                   updateArchiveInfoModalState({ open: true, arcId: arcid });
@@ -79,6 +79,9 @@ export const ArchiveList = ({
                       index={idx}
                       id={arcid}
                       title={title}
+                      tags={tags}
+                      isnew={isnew}
+                      pagecount={pagecount}
                       isSearch={isSearch}
                       onInfoClick={onInfoClick}
                       baseUrl={baseUrl}

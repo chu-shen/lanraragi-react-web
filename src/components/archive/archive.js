@@ -5,12 +5,18 @@ import { THUMBNAIL_URL } from "../../requests/constants";
 import { Loading } from "../loading/loading";
 import { ARCHIVE_STYLES } from "./constants";
 import { ArchiveActionButtons } from "./fragments/archive-action-buttons";
+import { ArchiveMetadataButtons } from "./fragments/archive-metadata-buttons";
+import { getTagsObjectFromTagsString } from "../../utils";
+import { DateTime } from "luxon";
 
 const styles = ARCHIVE_STYLES;
 
 export const Archive = ({
   id,
   title,
+  tags,
+  isnew,
+  pagecount,
   index,
   onInfoClick,
   baseUrl,
@@ -50,6 +56,13 @@ export const Archive = ({
       ref?.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [id, currentArchiveId, ref, loading]);
 
+
+  const tagsAsObject = getTagsObjectFromTagsString(tags);
+  var date_added = tagsAsObject?.date_added ?? '';
+  date_added = DateTime.fromSeconds(Number(date_added)).toLocaleString()
+  // TODO: 调整为可配置
+  const language = tagsAsObject?.语言 ?? [];
+
   return (
     <Paper id={`archive_${id}`} style={styles.paper}>
       <div>
@@ -59,7 +72,8 @@ export const Archive = ({
             loading={loading}
             height={styles.image.maxHeight}
           >
-            <img
+            <div style={{ position: 'relative' }}>
+              <img
               id={`archive-img-${index}`}
               alt={`thumbnail for ${title}`}
               style={{
@@ -70,24 +84,38 @@ export const Archive = ({
               height={height}
               width={width}
               loading="lazy"
-            />
+              />
+              {Boolean(isnew == 'true') ? <div style={{ position: 'absolute', zIndex: 2, left: '0px', top: '0px', backgroundColor: "blue" }}>NEW!</div> : <div></div>}
+              <div style={{ position: 'absolute', zIndex: 2, right: '0px', bottom: '0px', backgroundColor: "black" }}>{pagecount}</div>
+              <div style={{ position: 'absolute', zIndex: 2, left: '0px', bottom: '0px', backgroundColor: "black" }}>{date_added}</div>
+              <div style={{ position: 'absolute', zIndex: 2, right: '0px', top: '0px', backgroundColor: "black" }}>{language[0]}</div>
+
+            </div>
           </Loading>
         </div>
       </div>
       <div style={{ padding: "8px" }}>
         <button type="button" onClick={onTitleClick}>
-          <p
+          <a
             id={`archive-text-${index}`}
             style={{
               ...styles.typography,
               ...(!showFullTitle && styles.clamp),
+              textDecoration: 'none',
+              color: 'white',              
             }}
             ref={ref}
+            href={`http://${baseUrl}/reader?id=${id}`}
+            target="_blank"
           >
             {title}
-          </p>
+          </a>
         </button>
       </div>
+      <ArchiveMetadataButtons
+        id={id}
+        tagsAsObject={tagsAsObject}
+      />
       <ArchiveActionButtons
         id={id}
         title={title}
