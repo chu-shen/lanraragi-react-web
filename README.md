@@ -1,3 +1,29 @@
+- Show more information
+  - Basic metadata
+  - Clickable title (Lanraragi URL)
+  - Clickable useful tag
+  - Clickable artist tag
+  - Clickable source tag
+
+- Support update archive tag metadata
+  - Add tag:Rating
+  - Add tag:Comment
+
+- Fix
+  - Add API key for updateCategory&deleteArchiveById
+  - Temporary solution for scrolling on tablet & phone
+
+**Warning**
+
+This is for personal use, so some Chinese tags in the code are hard-coded.
+
+Unless using Chinese tags, the tags should be modified to English version before use.
+
+I haven't figured out how to solve it yet.
+
+![](legend-Tony.png)
+
+
 # Lanraragi React Web
 
 A react based front-end application for making use of the [Lanraragi](https://github.com/Difegue/LANraragi) api. Works best on mobile and tablet viewports, but the desktop experience is okay.
