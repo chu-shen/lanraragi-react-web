@@ -7,28 +7,28 @@ import {
 } from "@mui/material";
 import React, { useCallback, useState } from "react";
 import {
-  getDisplayMethodForWideArchive,
-  setDisplayMethodForWideArchive,
+  getDisplayMethodForWideArchiveThumbnails,
+  setDisplayMethodForWideArchiveThumbnails,
 } from "../../../../storage/archives";
 
 const options = ["contain", "cover", "fill"];
 
-export const DisplayMethodWide = () => {
+export const DisplayMethodWideThumbnails = () => {
   const [stateDisplayMethod, setStateDisplayMethod] = useState(
-    getDisplayMethodForWideArchive()
+    getDisplayMethodForWideArchiveThumbnails()
   );
 
   const onChange = useCallback((e) => {
     const { value } = e.target;
     setStateDisplayMethod(value);
-    setDisplayMethodForWideArchive(value);
+    setDisplayMethodForWideArchiveThumbnails(value);
   }, []);
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Grid container justifyContent="center">
-          <Typography>Display method for wide archive</Typography>
+          <Typography>Display method for wide archive thumbails</Typography>
         </Grid>
       </Grid>
       <Grid item xs={12}>

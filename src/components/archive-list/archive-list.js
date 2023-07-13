@@ -7,7 +7,7 @@ import { getBaseUrl } from "../../storage/requests";
 import { getCurrentArchiveId } from "../../app/selectors";
 import { updateInfoDialogArchiveId } from "../../app/slice";
 import {
-  getDisplayMethodForWideArchive,
+  getDisplayMethodForWideArchiveThumbnails,
   getNumArchivePerRow,
 } from "../../storage/archives";
 import { Loading } from "../loading/loading";
@@ -31,7 +31,7 @@ export const ArchiveList = ({
   const secondSliceValue = sliceToRender[1] ?? archives.length;
   const baseUrl = getBaseUrl();
   const columns = getNumArchivePerRow();
-  const wideThumbnailDisplayMethod = getDisplayMethodForWideArchive();
+  const wideThumbnailDisplayMethod = getDisplayMethodForWideArchiveThumbnails();
   const onInfoClick = useCallback((arcId) => {
     dispatch(updateInfoDialogArchiveId(arcId));
     updateArchiveInfoModalState({ open: true, arcId });
