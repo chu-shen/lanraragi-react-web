@@ -8,7 +8,7 @@ body {
   max-height: 100svh;
   max-width: 100svw;
   width: 100svw;
-  overflow: auto;
+  overflow: hidden;
 }
 
 #root {
