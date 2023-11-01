@@ -11,6 +11,7 @@ import {
   updateArchiveOpenedFrom,
 } from "../../../app/slice";
 import { addArchiveToArchiveHistory } from "../../../storage/history";
+import { clearArchiveNewFlag } from "../../../requests/files";
 
 const styles = ARCHIVE_STYLES;
 
@@ -26,7 +27,7 @@ export const ArchiveActionButtons = ({
   const handleInfoClick = useCallback(() => {
     onInfoClick(id);
   }, [id]);
-  const onPress = useCallback(() => {
+  const onPress = useCallback(async () => {
     if (currentArchiveId !== id) dispatch(updatePages([]));
     dispatch(setAllSectionVisibilityFalse());
     dispatch(updateSectionVisibility({ images: true }));
@@ -37,6 +38,7 @@ export const ArchiveActionButtons = ({
       title,
       date: DateTime.now().toLocaleString(DateTime.DATETIME_HUGE_WITH_SECONDS),
     });
+    await clearArchiveNewFlag(id);
   }, [id, currentArchiveId, isSearch, title]);
 
   return (

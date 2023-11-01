@@ -8,6 +8,8 @@ export const THUMBNAIL_URL = "/api/archives/:id/thumbnail";
 
 export const FILES_URL = "/api/archives/:id/files";
 
+export const NEW_FLAG_URL = "/api/archives/:id/isnew";
+
 export const METADATA_URL = "/api/archives/:id/metadata";
 
 export const CATEGORIES_URL = "/api/categories";

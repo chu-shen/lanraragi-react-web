@@ -9,9 +9,8 @@
   - Add tag:Rating
   - Add tag:Comment
 
-- Fix
-  - Add API key for updateCategory&deleteArchiveById
-  - Temporary solution for scrolling on tablet & phone
+- Update Reading Progression
+  - **Only** Support Clear Archive New flag
 
 **Warning**
 
