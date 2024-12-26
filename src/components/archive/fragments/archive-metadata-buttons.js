@@ -1,15 +1,14 @@
 import { Rating, TextField, Button, Grid } from "@mui/material";
-import React, { useState } from "react";
-import { getArchiveMetaData, updateArchiveMetaData } from "../../../requests/metadata";
+import React, { useState, useCallback } from "react";
+import { getArchiveMetaData, updateArchiveMetadata } from "../../../requests/metadata";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setAllSectionVisibilityFalse,
-  updateSearchArchives,
+  updateLoading,
   updateSearchFilter,
   updateSearchPage,
   updateSectionVisibility,
 } from "../../../app/slice";
-import { getArchivesBySearch } from "../../../requests/search";
 import {
   getSearchCategory,
   getSearchSort,
@@ -17,6 +16,7 @@ import {
 } from "../../../app/selectors";
 import { setSearchStats } from "../../../storage/search";
 import { addSearchToSearchHistory } from "../../../storage/history";
+import { trimEnd } from "lodash";
 
 export const ArchiveMetadataButtons = ({
   id,
@@ -48,7 +48,12 @@ export const ArchiveMetadataButtons = ({
         rating = parseFloat(rating)
         newTags = newTags + ", Rating:" + rating;
       }
-      updateArchiveMetaData(id, null, newTags.trim(), null);
+      updateArchiveMetadata({
+        id: id,
+        title: null,
+        tags: trimEnd(newTags),
+        summary: null,
+      })
       setCurrentRating(rating);
     } catch (error) {
       console.log(`Error: ${error.message}`);
@@ -64,7 +69,12 @@ export const ArchiveMetadataButtons = ({
       if (comment != null && comment != '') {
         newTags = newTags + ", Comment:" + comment;
       }
-      updateArchiveMetaData(id, null, newTags.trim(), null);
+      updateArchiveMetadata({
+        id: id,
+        title: null,
+        tags: trimEnd(newTags),
+        summary: null,
+      })
       setCurrentComment(comment);
     } catch (error) {
       console.log(`Error: ${error.message}`);
@@ -72,26 +82,18 @@ export const ArchiveMetadataButtons = ({
   };
 
 
+  // 详见 src/components/tags/tags.js
   const dispatch = useDispatch();
   const searchCategory = useSelector(getSearchCategory);
   const sort = useSelector(getSearchSort);
   const sortDirection = useSelector(getSearchSortDirection);
 
-  const callNewArchives = async (searchVal) => {
-    const arcs = await getArchivesBySearch({
-      filter: searchVal,
-      sortby: sort,
-      order: sortDirection,
-      start: -1,
-      ...(searchCategory?.id && { category: searchCategory?.id }),
-    });
-    dispatch(updateSearchArchives(arcs.data));
-  };
-  const onTagClick = (tagType, tag) => {
+  const onTagClick = useCallback((tagType, tag) => {
     const filter = tagType !== "other" ? `${tagType}:${tag}` : tag;
-    callNewArchives(filter);
+
     dispatch(updateSearchFilter(filter));
     dispatch(updateSearchPage(1));
+    dispatch(updateLoading({ search: true }));
     dispatch(setAllSectionVisibilityFalse());
     dispatch(updateSectionVisibility({ search: true }));
 
@@ -104,7 +106,9 @@ export const ArchiveMetadataButtons = ({
     };
     setSearchStats(searchStatsObject);
     addSearchToSearchHistory(searchStatsObject);
-  };
+  },
+    [sort, sortDirection, searchCategory]
+  );
 
   const [expanded, setExpanded] = useState(false);
   const handleToggleExpanded = () => {

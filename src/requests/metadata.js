@@ -20,6 +20,7 @@ export const updateArchiveMetadata = async ({ id, title, tags, summary }) => {
   if (title) formData.append("title", title);
   if (tags) formData.append("tags", tags);
   if (summary) formData.append("summary", summary);
+  formData.append("key", `${getApiKey()}`);
   const response = await axios.put(
     `${httpOrHttps()}${getBaseUrl()}${METADATA_URL.replace(":id", id)}`,
     formData,

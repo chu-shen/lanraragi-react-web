@@ -1,19 +1,14 @@
 import React from "react";
 import { Paper, Grid } from "@mui/material";
 import { ArchiveActionButtons } from "./fragments/archive-action-buttons";
-import { getTagsObjectFromTagsString, EditArchiveButton } from "./fragments/edit-archive-button";
+import { EditArchiveButton } from "./fragments/edit-archive-button";
+import { ArchiveMetadataButtons } from "./fragments/archive-metadata-buttons";
+import { getTagsObjectFromTagsString, httpOrHttps } from "../../utils";
 import { Rating } from "../rating/rating";
 import { DateTime } from "luxon";
 import { useArchiveLogic } from "./useArchiveLogic";
 
 export const Archive = ({
-  id,
-  title,
-  tags,
-  isnew,
-  pagecount,
-  index,
-  onInfoClick,
   baseUrl,
   currentArchiveId,
   id,
@@ -24,6 +19,8 @@ export const Archive = ({
   numOfArchivesRendered,
   tags,
   title,
+  isnew,
+  pagecount,
 }) => {
   const { onLoad, onTitleClick, rating, ref, showFullTitle, src } =
     useArchiveLogic({
@@ -46,7 +43,8 @@ export const Archive = ({
         className="h-full flex flex-col justify-between relative bg-[#363940]"
         id={`archive_${id}`}
       >
-        <div className="overflow-hidden min-h-[300px] p-2 flex flex-row justify-center">
+        <div className="overflow-hidden min-h-[300px] p-2 flex flex-row justify-center"
+          style={{ position: 'relative' }}>
           <img
             className="object-contain w-max max-w-full max-h-[300px] rounded"
             id={`archive-img-${index}`}
@@ -54,10 +52,10 @@ export const Archive = ({
             src={src}
             onLoad={onLoad}
           />
-          {Boolean(isnew == 'true') ? <div style={{ position: 'absolute', zIndex: 2, left: '0px', top: '0px', backgroundColor: "blue" }}>NEW!</div> : <div></div>}
+          {Boolean(isnew == 'true') ? <div style={{ position: 'absolute', zIndex: 2, right: '0px', top: '0px', backgroundColor: "blue" }}>NEW!</div> : <div></div>}
           <div style={{ position: 'absolute', zIndex: 2, right: '0px', bottom: '0px', backgroundColor: "black" }}>{pagecount}</div>
           <div style={{ position: 'absolute', zIndex: 2, left: '0px', bottom: '0px', backgroundColor: "black" }}>{date_added}</div>
-          <div style={{ position: 'absolute', zIndex: 2, right: '0px', top: '0px', backgroundColor: "black" }}>{language[0]}</div>
+        <div style={{ position: 'absolute', zIndex: 2, left: '0px', top: '0px', backgroundColor: "black" }}>{language[0]}</div>
         </div>
         <div className="p-2">
           <button className="w-full" type="button" onClick={onTitleClick}>
@@ -66,6 +64,9 @@ export const Archive = ({
                 showFullTitle ? "" : "clamp"
               }`}
               id={`archive-text-${index}`}
+              ref={ref}
+              href={`${httpOrHttps()}${baseUrl}/reader?id=${id}`}
+              target="_blank"
             >
               {title}
             </a>
@@ -76,6 +77,10 @@ export const Archive = ({
             <Rating readOnly arcId={id} size="small" ratingProp={rating} />
           </div>
         )}
+        <ArchiveMetadataButtons
+          id={id}
+          tagsAsObject={tagsAsObject}
+        />
         <ArchiveActionButtons
           id={id}
           title={title}
@@ -85,10 +90,6 @@ export const Archive = ({
         />
         <EditArchiveButton id={id} title={title} onEditClick={onEditClick} />
       </Paper>
-      <span
-        ref={ref}
-        href={`${httpOrHttps()}${baseUrl}/reader?id=${id}`}
-        target="_blank" />
     </Grid>
   );
 };
