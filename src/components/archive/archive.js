@@ -72,11 +72,11 @@ export const Archive = ({
             </a>
           </button>
         </div>
-        {rating && (
+        {/* {rating && (
           <div>
             <Rating readOnly arcId={id} size="small" ratingProp={rating} />
           </div>
-        )}
+        )} */}
         <ArchiveMetadataButtons
           id={id}
           tagsAsObject={tagsAsObject}
