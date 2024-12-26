@@ -9,6 +9,7 @@ import { ArchiveList } from "../archive-list/archive-list";
 import { useWidth } from "../../hooks/useWidth";
 import { getNumArchivesToRender } from "../../storage/archives";
 import { Loading } from "../loading/loading";
+import { scrollIntoViewByElement } from "../../utils";
 
 export const Random = ({ display }) => {
   const breakpoint = useWidth();
@@ -19,8 +20,10 @@ export const Random = ({ display }) => {
 
   const callNewArchives = useCallback(async () => {
     dispatch(updateLoading({ random: true }));
-    dispatch(updateRandomArchives(await getRandomArchives(count)));
+    const randomArchiveArray = await getRandomArchives(count);
+    dispatch(updateRandomArchives(randomArchiveArray));
     dispatch(updateLoading({ random: false }));
+    scrollIntoViewByElement("#archive-text-0", 750);
   }, [count]);
 
   useEffect(() => {
@@ -33,14 +36,10 @@ export const Random = ({ display }) => {
 
   const footer = useMemo(
     () => (
-      <Grid container justifyContent="center" sx={{ pt: "1rem" }}>
+      <Grid className="pt-4" container justifyContent="center">
         <Grid item xs={12} sm={8}>
-          <Button
-            fullWidth
-            onClick={callNewArchives}
-            sx={{ textTransform: "none" }}
-          >
-            <Casino sx={{ mr: ".5rem" }} /> More Archives
+          <Button className="normal-case" fullWidth onClick={callNewArchives}>
+            <Casino className="mr-2" /> More Archives
           </Button>
         </Grid>
       </Grid>

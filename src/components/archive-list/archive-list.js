@@ -6,15 +6,13 @@ import { ArchiveInfoDialog } from "../dialogs/archive-info-dialog";
 import { getBaseUrl } from "../../storage/requests";
 import { getCurrentArchiveId } from "../../app/selectors";
 import { updateInfoDialogArchiveId } from "../../app/slice";
-import {
-  getDisplayMethodForWideArchiveThumbnails,
-  getNumArchivePerRow,
-} from "../../storage/archives";
+import { getNumArchivePerRow } from "../../storage/archives";
 import { Loading } from "../loading/loading";
+import { ArchiveEditDialog } from "../dialogs/archive-edit-dialog/archive-edit-dialog";
+import { ArchiveRatingDialog } from "../dialogs/archive-rating-dialog/archive-rating-dialog";
 
 export const ArchiveList = ({
   archives = [],
-  display,
   sliceToRender = [0, null],
   isSearch = false,
   archivesLoading = false,
@@ -28,56 +26,56 @@ export const ArchiveList = ({
     open: false,
     arcId: "",
   });
-  const secondSliceValue = sliceToRender[1] ?? archives.length;
+  const [archiveEditModalState, updateArchiveEditModalState] = useState({
+    open: false,
+    arcId: "",
+  });
+  const [archiveRatingModalState, updateArchiveRatingModalState] = useState({
+    open: false,
+    arcId: "",
+  });
   const baseUrl = getBaseUrl();
   const columns = getNumArchivePerRow();
-  const wideThumbnailDisplayMethod = getDisplayMethodForWideArchiveThumbnails();
   const onInfoClick = useCallback((arcId) => {
     dispatch(updateInfoDialogArchiveId(arcId));
     updateArchiveInfoModalState({ open: true, arcId });
   }, []);
+  const onEditClick = useCallback((arcId) => {
+    updateArchiveEditModalState({ open: true, arcId });
+    updateArchiveRatingModalState({ open: false, arcId });
+  }, []);
+
+  const displayArchives = sliceToRender[1] !== null
+    ? archives.slice(sliceToRender[0], sliceToRender[1])
+    : archives;
 
   return (
-    <div
-      className="full-height"
-      style={{
-        display,
-        overflowY: "scroll",
-      }}
-    >
-      <div style={{ padding: "2rem 1rem 75svh 1rem" }}>
+    <div className="full-height overflow-y-scroll">
+      <div className="pt-8 px-4 pb-[75svh]">
         {header}
-        <Grid
-          container
-          columns={columns}
-          spacing={2}
-          sx={{
-            marginTop: 0,
-          }}
-        >
+        <Grid className="mt-0 mb-6" container columns={columns} spacing={2}>
           <div id="archives-top" />
           <Loading loading={archivesLoading} label={loadingLabel}>
-            {archives
-              .slice(sliceToRender[0], secondSliceValue)
-              .map((archive, idx) => {
-                const { arcid, title, tags, isnew, pagecount } = archive;
-                return (
-                  <Archive
-                    key={arcid}
-                    index={idx}
-                    id={arcid}
-                    title={title}
-                    tags={tags}
-                    isnew={isnew}
-                    pagecount={pagecount}
-                    isSearch={isSearch}
-                    onInfoClick={onInfoClick}
-                    baseUrl={baseUrl}
-                    currentArchiveId={currentArchiveId}
-                    wideImageDisplayMethod={wideThumbnailDisplayMethod}
-                  />
-                );
-              })}
+            {displayArchives.map((archive, idx, arr) => {
+              const { arcid, title, tags, isnew, pagecount } = archive;
+              return (
+                <Archive
+                  baseUrl={baseUrl}
+                  currentArchiveId={currentArchiveId}
+                  id={arcid}
+                  index={idx}
+                  isSearch={isSearch}
+                  key={`${title}-${arcid}`}
+                  numOfArchivesRendered={arr.length}
+                  onEditClick={onEditClick}
+                  onInfoClick={onInfoClick}
+                  tags={tags}
+                  title={title}
+                  isnew={isnew}
+                  pagecount={pagecount}
+                />
+              );
+            })}
           </Loading>
         </Grid>
         {footer}
@@ -88,6 +86,24 @@ export const ArchiveList = ({
         }
         open={archiveInfoModalState.open}
         arcId={archiveInfoModalState.arcId}
+      />
+      <ArchiveEditDialog
+        arcId={archiveEditModalState.arcId}
+        onCloseProp={() =>
+          updateArchiveEditModalState({ ...archiveEditModalState, open: false })
+        }
+        updateArchiveRatingModalState={updateArchiveRatingModalState}
+        open={archiveEditModalState.open}
+      />
+      <ArchiveRatingDialog
+        open={archiveRatingModalState.open}
+        onClose={() =>
+          updateArchiveRatingModalState({
+            ...archiveRatingModalState,
+            open: false,
+          })
+        }
+        arcId={archiveRatingModalState.arcId}
       />
     </div>
   );

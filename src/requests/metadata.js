@@ -1,33 +1,37 @@
 import axios from "axios";
-import { HEADERS, METADATA_URL } from "./constants";
+import { GET_HEADERS, METADATA_URL } from "./constants";
 import { getBaseUrl, getApiKey } from "../storage/requests";
 import { httpOrHttps } from "../utils";
-
-const config = {
-  method: "get",
-  headers: HEADERS,
-};
+import { getRequestConfig } from "./request-utils";
 
 export const getArchiveMetaData = async (arcId) => {
   if (!arcId) return Error("No archive Id supplied");
   const metadata = await axios({
-    ...config,
+    ...getRequestConfig(),
     url: `${httpOrHttps()}${getBaseUrl()}${METADATA_URL.replace(":id", arcId)}`,
   });
-  return metadata.data;
+
+  return metadata?.data ?? {};
 };
 
-export const updateArchiveMetaData = async (arcId, newTags) => {
-  if (!arcId) return Error("No archive Id supplied");
-  axios({
-    method: "put",
-    url: `http://${getBaseUrl()}${METADATA_URL.replace(":id", arcId)}`,
-    params: { key: `${getApiKey()}`, tags: newTags }
-  })
-    .then((response) => response.data)
-    .catch((error) => {
-      return { error: "Sorry, something went wrong" };
-    });
+export const updateArchiveMetadata = async ({ id, title, tags, summary }) => {
+  if (!id) return Error("No archive Id supplied");
+  const formData = new FormData();
+  if (title) formData.append("title", title);
+  if (tags) formData.append("tags", tags);
+  if (summary) formData.append("summary", summary);
+  const response = await axios.put(
+    `${httpOrHttps()}${getBaseUrl()}${METADATA_URL.replace(":id", id)}`,
+    formData,
+    {
+      headers: {
+        ...GET_HEADERS(),
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response?.data;
 };
 
 export default getArchiveMetaData;

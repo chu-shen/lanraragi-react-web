@@ -2,6 +2,7 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Button, Grid, TextField, Typography } from "@mui/material";
+import classnames from "classnames";
 import {
   getApiKey,
   getBaseUrl,
@@ -12,30 +13,24 @@ import {
 } from "../../storage/requests";
 import { updateSectionVisibility } from "../../app/slice";
 
-const styles = {
-  outerGrid: {
-    padding: "4rem 3rem",
-    height: `${window.innerHeight}px`,
-  },
-  outerGridSettings: {
-    height: "auto",
-    padding: "4rem 1rem",
-  },
-};
-
 export const Url = ({ children, isSettings = false }) => {
   const dispatch = useDispatch();
   const [url, setUrl] = useState(getBaseUrl() ?? "");
+  const [urlFieldError, setUrlFieldError] = useState("");
   const [apiKey, setApiKey] = useState(getApiKey() ?? "");
   const [useHttps, setUseHttps] = useState(getUseHttps());
   const httpOrHttps = useHttps ? "https://" : "http://";
 
-  const onChangeText = useCallback((event) => setUrl(event.target.value), []);
-  const onChangeApiText = useCallback(
-    (event) => setApiKey(event.target.value),
-    []
-  );
+  const onChangeText = useCallback((event) => {
+    setUrl(event.target.value);
+    setUrlFieldError("");
+  }, []);
+  const onChangeApiText = useCallback((event) => setApiKey(event.target.value), []);
   const onPress = useCallback(() => {
+    if (!url) {
+      setUrlFieldError("Please enter a URL for your Lanraragi server");
+      return;
+    }
     storeBaseUrl(url);
     storeApiKey(apiKey);
     storeUseHttps(useHttps);
@@ -47,10 +42,10 @@ export const Url = ({ children, isSettings = false }) => {
 
   return !getBaseUrl() || isSettings ? (
     <Grid
-      style={{
-        ...styles.outerGrid,
-        ...(isSettings && styles.outerGridSettings),
-      }}
+      className={classnames(
+        { "h-auto px-4 py-16": isSettings },
+        { "h-svh py-16 px-12": !isSettings }
+      )}
       container
       alignContent="center"
       spacing={4}
@@ -72,6 +67,9 @@ export const Url = ({ children, isSettings = false }) => {
               </Grid>
               <Grid item xs={12} sm={10}>
                 <TextField
+                  helperText={urlFieldError}
+                  error={!!urlFieldError}
+                  required
                   label="Lanraragi Server Address"
                   value={url}
                   placeholder="Ex: 111.111.1.111:3000"

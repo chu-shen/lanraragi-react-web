@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import {
   deleteArchiveFromRandomArchives,
   deleteArchiveFromSearchArchives,
-  updateDisplayDeleteSnackbar,
+  updateDisplaySnackbar,
 } from "../../app/slice";
 import { deleteArchiveById } from "../../requests/delete";
 
@@ -12,10 +12,10 @@ export const DeleteArchive = ({ onClose, arcId, title, onBack }) => {
   const dispatch = useDispatch();
   const onDelete = useCallback(async () => {
     const response = await deleteArchiveById(arcId);
-    if (response.success) {
+    if (response?.success) {
       dispatch(deleteArchiveFromRandomArchives(arcId));
       dispatch(deleteArchiveFromSearchArchives(arcId));
-      dispatch(updateDisplayDeleteSnackbar(true));
+      dispatch(updateDisplaySnackbar({ open: true, type: "DELETE_ARCHIVE" }));
     }
     onClose();
     onBack(false);
@@ -26,10 +26,10 @@ export const DeleteArchive = ({ onClose, arcId, title, onBack }) => {
 
   return (
     <Grid
+      className="h-full mt-8"
       container
       direction="column"
       justifyContent="center"
-      sx={{ height: "100%", mt: "2rem" }}
       spacing={2}
     >
       <Grid item>

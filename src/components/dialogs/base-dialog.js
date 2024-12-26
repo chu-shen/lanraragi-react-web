@@ -12,17 +12,13 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 
-const STYLES = {
-  dialogTitle: { ml: 2, flex: 1, fontSize: "1.25rem" },
-};
-
 export const BaseDialog = ({
   open = false,
   onClose,
   title,
   children,
-  titleStyles = {},
   fullWidth = false,
+  fullScreen,
   maxWidth = "sm",
 }) => {
   const theme = useTheme();
@@ -31,14 +27,14 @@ export const BaseDialog = ({
 
   return (
     <Dialog
-      fullScreen={smDown}
+      fullScreen={fullScreen ?? smDown}
       open={open}
       onClose={onClose}
       fullWidth={fullWidth}
       maxWidth={maxWidth}
     >
-      <DialogTitle sx={{ padding: 0, ...titleStyles }}>
-        <AppBar sx={{ position: "relative" }}>
+      <DialogTitle className="p-0">
+        <AppBar className="relative">
           <Toolbar>
             <IconButton
               edge="start"
@@ -49,7 +45,7 @@ export const BaseDialog = ({
               <Close />
             </IconButton>
             {!isElement ? (
-              <Typography sx={STYLES.dialogTitle} component="div">
+              <Typography className="flex text-xl ml-2" component="div">
                 {title}
               </Typography>
             ) : (

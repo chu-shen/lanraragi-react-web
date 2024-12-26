@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { DateTime } from "luxon";
 import {
   setAllSectionVisibilityFalse,
+  updateArchiveOpenedFrom,
   updateCurrentArchiveId,
   updatePages,
   updateSectionVisibility,
@@ -20,6 +21,7 @@ export const ArchiveHistoryButton = ({ title, id }) => {
     dispatch(setAllSectionVisibilityFalse());
     dispatch(updateSectionVisibility({ images: true }));
     dispatch(updateCurrentArchiveId(id));
+    dispatch(updateArchiveOpenedFrom("history"));
     addArchiveToArchiveHistory({
       id,
       title,
@@ -30,10 +32,10 @@ export const ArchiveHistoryButton = ({ title, id }) => {
   return (
     <Button
       aria-label={`Click to open archive ${title}`}
+      className="normal-case h-full"
       component={Paper}
       fullWidth
       onClick={onClick}
-      sx={{ textTransform: "none", height: "100%" }}
     >
       {title}
     </Button>

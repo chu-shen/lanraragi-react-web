@@ -1,18 +1,13 @@
 import React, { useState } from "react";
-import {
-  Alert,
-  Button,
-  FormControl,
-  Grid,
-  InputLabel,
-  Select,
-} from "@mui/material";
+import he from "he";
+import { Alert, Button, FormControl, Grid, InputLabel, Select, Typography } from "@mui/material";
 import { updateCategory } from "../../requests/categories";
 
 export const Categories = ({ arcId, categories }) => {
   const [selectedCatagoryID, setSelectedCategory] = useState("");
   const [response, setResponse] = useState(null);
   const onChange = (e) => {
+    setResponse(null);
     setSelectedCategory(e.target.value);
   };
   const onClick = () => {
@@ -23,31 +18,30 @@ export const Categories = ({ arcId, categories }) => {
       });
       setResponse(updateCategoryResponse);
     };
+    if (!selectedCatagoryID) {
+      setResponse({ error: "Please select a category" });
+      return;
+    }
     updateCat();
   };
 
+  const error = response?.error;
   const categoriesToShow = categories.filter((cat) => !!cat.archives.length);
 
   return categoriesToShow.length ? (
     <Grid container>
       {response && (
-        <Alert
-          severity={response?.error ? "error" : "success"}
-          sx={{ margin: "0 0 1rem 0" }}
-        >
-          {response?.error ?? ""}
-          {response?.successMessage ?? ""}
+        <Alert className="mx-0 mt-0 mb-4" severity={error ? "error" : "success"}>
+          <Typography>{error || he.decode(response?.successMessage ?? "")}</Typography>
         </Alert>
       )}
       <Grid item xs={12} sm={12}>
         <FormControl fullWidth>
-          <InputLabel
-            id="category-select-info-dialog"
-            htmlFor="category-select-select"
-          >
+          <InputLabel id="category-select-info-dialog" htmlFor="category-select-select">
             Category
           </InputLabel>
           <Select
+            className="mx-0 mt-0 mb-4"
             variant="filled"
             fullWidth
             labelId="category-select-info-dialog"
@@ -56,7 +50,6 @@ export const Categories = ({ arcId, categories }) => {
             label="Category"
             onChange={onChange}
             native
-            sx={{ margin: "0 0 1rem 0" }}
           >
             <option value="" aria-label="none" />
             {categoriesToShow.map((cat) => (

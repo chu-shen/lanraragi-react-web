@@ -1,6 +1,8 @@
+/* eslint-disable function-paren-newline */
 import { createSlice } from "@reduxjs/toolkit";
 import { getNewSearchArchivesArrayAfterDeletingArchiveId } from "../utils";
 import { getSearchStats } from "../storage/search";
+import { loadSearchSettings, saveSearchSettings } from '../storage/searchSettings';
 
 const initialState = {
   archiveOpenedFrom: "random",
@@ -8,12 +10,16 @@ const initialState = {
   categories: [],
   currentArchiveId: "",
   displayNavbar: true,
-  displayDeleteSnackbar: false,
+  displaySnackbar: {
+    open: false,
+    type: "",
+  },
   infoDialogArchiveId: "",
   pages: [],
   randomArchives: [],
   renderedPages: [],
   searchArchives: [],
+  searchArchivesTotal: 0,
   searchCategory: {},
   searchFilter: "",
   searchPage: 1,
@@ -32,6 +38,9 @@ const initialState = {
     search: false,
     random: false,
     images: false,
+  },
+  settings: {
+    usePaginatedSearch: loadSearchSettings(),
   },
 };
 
@@ -64,7 +73,8 @@ export const appSlice = createSlice({
       state.randomArchives = [...payload];
     },
     updateSearchArchives: (state, { payload }) => {
-      state.searchArchives = [...payload];
+      state.searchArchives = [...payload.archives];
+      state.searchArchivesTotal = payload.total;
     },
     updateBaseUrl: (state, { payload }) => {
       state.baseUrl = `${payload}`;
@@ -116,8 +126,8 @@ export const appSlice = createSlice({
     updateSearchSortDirection: (state, { payload }) => {
       state.searchSortDirection = payload;
     },
-    updateDisplayDeleteSnackbar: (state, { payload }) => {
-      state.displayDeleteSnackbar = payload;
+    updateDisplaySnackbar: (state, { payload }) => {
+      state.displaySnackbar = { ...payload };
     },
     deleteArchiveFromRandomArchives: (state, { payload }) => {
       state.randomArchives = [
@@ -131,9 +141,40 @@ export const appSlice = createSlice({
           payload
         ),
       ];
+      state.searchArchivesTotal = Math.max(0, state.searchArchivesTotal - 1);
+    },
+    updateArchiveTags: (state, { payload }) => {
+      if (!payload?.tags) return;
+      const { arcId, tags } = payload;
+      const arcIdForArchive = arcId ?? state.currentArchiveId;
+      const searchArchives = [...state.searchArchives];
+      const randomArchives = [...state.randomArchives];
+      const bothArchiveTypes = [searchArchives, randomArchives];
+      const [searchIndex, randomIndex] = bothArchiveTypes.map((archives) =>
+        archives.findIndex((arc) => arc.arcid === arcIdForArchive)
+      );
+
+      if (searchIndex !== -1) {
+        searchArchives[searchIndex] = {
+          ...searchArchives[searchIndex],
+          tags,
+        };
+      }
+      if (randomIndex !== -1) {
+        randomArchives[randomIndex] = {
+          ...randomArchives[randomIndex],
+          tags,
+        };
+      }
+      state.searchArchives = [...searchArchives];
+      state.randomArchives = [...randomArchives];
     },
     updateTags: (state, { payload }) => {
       state.tags = [...payload];
+    },
+    updateSearchPaginationSetting: (state, { payload }) => {
+      state.settings.usePaginatedSearch = payload;
+      saveSearchSettings(payload);
     },
   },
 });
@@ -157,10 +198,12 @@ export const {
   updateSearchSort,
   updateSearchSortDirection,
   updateLoading,
-  updateDisplayDeleteSnackbar,
+  updateDisplaySnackbar,
   deleteArchiveFromRandomArchives,
   deleteArchiveFromSearchArchives,
   updateTags,
+  updateArchiveTags,
+  updateSearchPaginationSetting,
 } = appSlice.actions;
 
 export default appSlice.reducer;

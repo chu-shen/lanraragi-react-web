@@ -1,8 +1,7 @@
-import { Button, Grid } from "@mui/material";
+import { Button } from "@mui/material";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { DateTime } from "luxon";
-import { ARCHIVE_STYLES } from "../constants";
 import {
   setAllSectionVisibilityFalse,
   updatePages,
@@ -13,15 +12,7 @@ import {
 import { addArchiveToArchiveHistory } from "../../../storage/history";
 import { clearArchiveNewFlag } from "../../../requests/files";
 
-const styles = ARCHIVE_STYLES;
-
-export const ArchiveActionButtons = ({
-  id,
-  currentArchiveId,
-  isSearch,
-  title,
-  onInfoClick,
-}) => {
+export const ArchiveActionButtons = ({ id, currentArchiveId, isSearch, title, onInfoClick }) => {
   const dispatch = useDispatch();
 
   const handleInfoClick = useCallback(() => {
@@ -42,29 +33,24 @@ export const ArchiveActionButtons = ({
   }, [id, currentArchiveId, isSearch, title]);
 
   return (
-    <Grid container>
-      <Grid item xs={6}>
-        <Button
-          aria-label={`Click here to read ${title}`}
-          variant="contained"
-          onClick={onPress}
-          fullWidth
-          sx={styles.readButton}
-        >
-          Read
-        </Button>
-      </Grid>
-      <Grid item xs={6}>
-        <Button
-          aria-label={`Click here for info and to modify categories for ${title}`}
-          variant="contained"
-          onClick={handleInfoClick}
-          fullWidth
-          sx={styles.infoButton}
-        >
-          Info
-        </Button>
-      </Grid>
-    </Grid>
+    <div className="flex">
+      <Button
+        aria-label={`Click here to read ${title}`}
+        className="w-full bg-[#43464E] rounded-bl shadow-none"
+        variant="contained"
+        onClick={onPress}
+      >
+        Read
+      </Button>
+      <span className="w-px h-full border border-solid border-[#363940]" />
+      <Button
+        className="w-full bg-[#43464E] rounded-br shadow-none"
+        aria-label={`Click here for info and to modify categories for ${title}`}
+        variant="contained"
+        onClick={handleInfoClick}
+      >
+        Info
+      </Button>
+    </div>
   );
 };

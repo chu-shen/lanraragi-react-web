@@ -1,15 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React from "react";
 import { Paper, Grid } from "@mui/material";
-import { useImageSize } from "react-image-size";
-import { THUMBNAIL_URL } from "../../requests/constants";
-import { Loading } from "../loading/loading";
-import { ARCHIVE_STYLES } from "./constants";
 import { ArchiveActionButtons } from "./fragments/archive-action-buttons";
-import { ArchiveMetadataButtons } from "./fragments/archive-metadata-buttons";
-import { getTagsObjectFromTagsString, httpOrHttps } from "../../utils";
+import { getTagsObjectFromTagsString, EditArchiveButton } from "./fragments/edit-archive-button";
+import { Rating } from "../rating/rating";
 import { DateTime } from "luxon";
-
-const styles = ARCHIVE_STYLES;
+import { useArchiveLogic } from "./useArchiveLogic";
 
 export const Archive = ({
   id,
@@ -21,41 +16,23 @@ export const Archive = ({
   onInfoClick,
   baseUrl,
   currentArchiveId,
+  id,
+  index,
   isSearch,
-  wideImageDisplayMethod,
+  onEditClick,
+  onInfoClick,
+  numOfArchivesRendered,
+  tags,
+  title,
 }) => {
-  const [showFullTitle, updateShowFullTitle] = useState(false);
-  const src = `${httpOrHttps()}${baseUrl}${THUMBNAIL_URL.replace(":id", id)}`;
-  const [dimensions, { loading }] = useImageSize(src);
-  const width = dimensions?.width ?? 0;
-  const height = dimensions?.height ?? 0;
-  const wideImage = width > height;
-  const diffBetweenMaxHeightAndImageHeight = 300 - height;
-  const isDiffBetweenMaxHeightAndImageHeightPositive =
-    diffBetweenMaxHeightAndImageHeight > 0;
-  const extraMargin = isDiffBetweenMaxHeightAndImageHeightPositive
-    ? `${diffBetweenMaxHeightAndImageHeight * 0.5}px`
-    : 0;
-  const wideImageStyles = {
-    ...styles.imageWide,
-    ...(wideImageDisplayMethod && { objectFit: wideImageDisplayMethod }),
-    ...(isDiffBetweenMaxHeightAndImageHeightPositive && {
-      marginTop: extraMargin,
-      marginBottom: extraMargin,
-    }),
-  };
-
-  const ref = useRef();
-
-  const onTitleClick = useCallback(() => {
-    updateShowFullTitle(!showFullTitle);
-  }, [showFullTitle]);
-
-  useEffect(() => {
-    if (id === currentArchiveId && !loading)
-      ref?.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [id, currentArchiveId, ref, loading]);
-
+  const { onLoad, onTitleClick, rating, ref, showFullTitle, src } =
+    useArchiveLogic({
+      baseUrl,
+      currentArchiveId,
+      id,
+      numOfArchivesRendered,
+      tags,
+    });
 
   const tagsAsObject = getTagsObjectFromTagsString(tags);
   var date_added = tagsAsObject?.date_added ?? '';
@@ -64,57 +41,41 @@ export const Archive = ({
   const language = tagsAsObject?.语言 ?? [];
 
   return (
-    <Grid xs={1} sm={1} md={1} lg={1} xl={1} item sx={styles.grid}>
-      <Paper id={`archive_${id}`} style={styles.paper}>
-        <div style={styles.imageWrapper}>
-          <Loading
-            label="Loading thumbnail"
-            loading={loading}
-            height={styles.image.maxHeight}
-          >
-            <div style={{ position: 'relative' }}>
-              <img
-                id={`archive-img-${index}`}
-                alt={`thumbnail for ${title}`}
-                style={{
-                  ...styles.image,
-                  ...(wideImage ? wideImageStyles : styles.imageLong),
-                }}
-                src={src}
-                height={height}
-                width={width}
-                loading="lazy"
-              />
-              {Boolean(isnew == 'true') ? <div style={{ position: 'absolute', zIndex: 2, left: '0px', top: '0px', backgroundColor: "blue" }}>NEW!</div> : <div></div>}
-              <div style={{ position: 'absolute', zIndex: 2, right: '0px', bottom: '0px', backgroundColor: "black" }}>{pagecount}</div>
-              <div style={{ position: 'absolute', zIndex: 2, left: '0px', bottom: '0px', backgroundColor: "black" }}>{date_added}</div>
-              <div style={{ position: 'absolute', zIndex: 2, right: '0px', top: '0px', backgroundColor: "black" }}>{language[0]}</div>
-
-            </div>
-          </Loading>
+    <Grid xs={1} sm={1} md={1} lg={1} xl={1} item>
+      <Paper
+        className="h-full flex flex-col justify-between relative bg-[#363940]"
+        id={`archive_${id}`}
+      >
+        <div className="overflow-hidden min-h-[300px] p-2 flex flex-row justify-center">
+          <img
+            className="object-contain w-max max-w-full max-h-[300px] rounded"
+            id={`archive-img-${index}`}
+            alt={`thumbnail for ${title}`}
+            src={src}
+            onLoad={onLoad}
+          />
+          {Boolean(isnew == 'true') ? <div style={{ position: 'absolute', zIndex: 2, left: '0px', top: '0px', backgroundColor: "blue" }}>NEW!</div> : <div></div>}
+          <div style={{ position: 'absolute', zIndex: 2, right: '0px', bottom: '0px', backgroundColor: "black" }}>{pagecount}</div>
+          <div style={{ position: 'absolute', zIndex: 2, left: '0px', bottom: '0px', backgroundColor: "black" }}>{date_added}</div>
+          <div style={{ position: 'absolute', zIndex: 2, right: '0px', top: '0px', backgroundColor: "black" }}>{language[0]}</div>
         </div>
-        <div style={{ padding: "8px" }}>
-          <button type="button" onClick={onTitleClick}>
+        <div className="p-2">
+          <button className="w-full" type="button" onClick={onTitleClick}>
             <a
+              className={`normal-case font-bold m-0 text-sm ${
+                showFullTitle ? "" : "clamp"
+              }`}
               id={`archive-text-${index}`}
-              style={{
-                ...styles.typography,
-                ...(!showFullTitle && styles.clamp),
-                textDecoration: 'none',
-                color: 'white',
-              }}
-              ref={ref}
-              href={`http://${baseUrl}/reader?id=${id}`}
-              target="_blank"
             >
               {title}
             </a>
           </button>
         </div>
-        <ArchiveMetadataButtons
-          id={id}
-          tagsAsObject={tagsAsObject}
-        />
+        {rating && (
+          <div>
+            <Rating readOnly arcId={id} size="small" ratingProp={rating} />
+          </div>
+        )}
         <ArchiveActionButtons
           id={id}
           title={title}
@@ -122,7 +83,12 @@ export const Archive = ({
           isSearch={isSearch}
           onInfoClick={onInfoClick}
         />
+        <EditArchiveButton id={id} title={title} onEditClick={onEditClick} />
       </Paper>
+      <span
+        ref={ref}
+        href={`${httpOrHttps()}${baseUrl}/reader?id=${id}`}
+        target="_blank" />
     </Grid>
   );
 };

@@ -1,9 +1,8 @@
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useState } from "react";
-import { Grid, IconButton, Typography } from "@mui/material";
-import { AbcOutlined, Pin } from "@mui/icons-material";
+import { Button, Grid, Typography } from "@mui/material";
 
-export const IdTitleCopyButton = ({ arcId, archiveTitle }) => {
+export const IdTitleSwitchButton = ({ arcId, archiveTitle }) => {
   const [showId, setShowId] = useState(false);
   const onSwitch = useCallback(() => {
     setShowId(!showId);
@@ -11,32 +10,32 @@ export const IdTitleCopyButton = ({ arcId, archiveTitle }) => {
 
   return (
     <Grid
+      className="h-full"
       alignContent="center"
       justifyContent="center"
       container
-      sx={{ height: "100%" }}
     >
-      <Grid item xs={10}>
+      <Grid item xs={12}>
         <Typography textAlign="center">
           {showId ? (
             <>
               Archive ID:
               <br />
-              <span style={{ overflowWrap: "anywhere" }}>{arcId}</span>
+              <span className="overflow-wrap-anywhere">{arcId}</span>
             </>
           ) : (
             archiveTitle
           )}
         </Typography>
       </Grid>
-      <Grid item xs={2}>
-        <IconButton
+      <Grid item xs={12}>
+        <Button
           aria-label={`Click here to show Archive ${!showId ? "ID" : "Title"}`}
+          className="w-full h-full rounded-none"
           onClick={onSwitch}
-          style={{ width: "100%", height: "100%", borderRadius: "unset" }}
         >
-          {showId ? <AbcOutlined /> : <Pin />}
-        </IconButton>
+          Display Archive {showId ? "Title" : "ID"}
+        </Button>
       </Grid>
     </Grid>
   );

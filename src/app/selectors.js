@@ -17,13 +17,31 @@ export const getCurrentRandomArchives = createSelector(getApp, (app) => [
   ...app.randomArchives,
 ]);
 
-export const getCurrentSearchArchives = createSelector(getApp, (app) => [
-  ...app.searchArchives,
-]);
+export const getCurrentSearchArchives = createSelector(
+  getApp,
+  (app) => [...app.searchArchives]
+);
+
+export const getSearchArchivesTotal = createSelector(
+  getApp,
+  (app) => app.searchArchivesTotal
+);
+
+export const getRandomAndSearchArchives = createSelector(
+  getCurrentRandomArchives,
+  getCurrentSearchArchives,
+  (randomArchives, searchArchives) => [...randomArchives, ...searchArchives]
+);
+
+export const getCurrentArchiveFromRandomAndResults = createSelector(
+  getCurrentArchiveId,
+  getRandomAndSearchArchives,
+  (arcId, archives) => archives.find((arc) => arc.arcid === arcId) ?? {}
+);
 
 export const getAmountOfSearchArchives = createSelector(
-  getCurrentSearchArchives,
-  (archives) => archives.length
+  getSearchArchivesTotal,
+  (total) => total
 );
 
 export const getCurrentArciveRandomArchivesIndex = createSelector(
@@ -51,6 +69,14 @@ export const getBaseUrlSelector = createSelector(
 export const getSectionVisibilityObject = createSelector(getApp, (app) => ({
   ...app.sectionVisibility,
 }));
+
+export const getVisibleSection = createSelector(
+  getSectionVisibilityObject,
+  (sectionVisibilityObject) =>
+    Object.keys(sectionVisibilityObject).find(
+      (section) => sectionVisibilityObject[section] === true
+    )
+);
 
 export const getSectionVisibilityObjectWithAllFalse = createSelector(
   getSectionVisibilityObject,
@@ -94,11 +120,11 @@ export const getSearchFilter = createSelector(
 );
 
 export const getMaxPages = createSelector(
-  getAmountOfSearchArchives,
-  (numOfArchive) => (breakpoint) => {
+  getSearchArchivesTotal,
+  (total) => (breakpoint) => {
     const maxNum = getNumArchivesToRender();
-    const maxPageNumber = numOfArchive / maxNum[breakpoint];
-    return numOfArchive % maxNum[breakpoint] === 0
+    const maxPageNumber = total / maxNum[breakpoint];
+    return total % maxNum[breakpoint] === 0
       ? maxPageNumber
       : Math.ceil(maxPageNumber);
   }
@@ -152,9 +178,9 @@ export const getSearchCategory = createSelector(
 
 export const getLoading = createSelector(getApp, (app) => app?.loading ?? {});
 
-export const getDisplayDeleteSnackbar = createSelector(
+export const getDisplaySnackbar = createSelector(
   getApp,
-  (app) => !!app?.displayDeleteSnackbar
+  (app) => app?.displaySnackbar ?? {}
 );
 
 export const getTags = createSelector(getApp, (app) => app?.tags ?? []);
@@ -165,4 +191,9 @@ export const getAutocompleteTags = createSelector(getTags, (tags) =>
     const text = tag?.text;
     return namespace ? `${namespace}:${text}` : text;
   })
+);
+
+export const getUsePaginatedSearch = createSelector(
+  getApp,
+  (app) => app.settings.usePaginatedSearch
 );

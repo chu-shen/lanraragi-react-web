@@ -48,7 +48,7 @@ export const ArchiveMetadataButtons = ({
         rating = parseFloat(rating)
         newTags = newTags + ", Rating:" + rating;
       }
-      updateArchiveMetaData(id, newTags.trim());
+      updateArchiveMetaData(id, null, newTags.trim(), null);
       setCurrentRating(rating);
     } catch (error) {
       console.log(`Error: ${error.message}`);
@@ -64,7 +64,7 @@ export const ArchiveMetadataButtons = ({
       if (comment != null && comment != '') {
         newTags = newTags + ", Comment:" + comment;
       }
-      updateArchiveMetaData(id, newTags.trim());
+      updateArchiveMetaData(id, null, newTags.trim(), null);
       setCurrentComment(comment);
     } catch (error) {
       console.log(`Error: ${error.message}`);
