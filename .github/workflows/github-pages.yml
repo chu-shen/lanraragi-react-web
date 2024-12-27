@@ -1,6 +1,9 @@
 name: ratingAndcomment demo site
 on: [push, workflow_dispatch]
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
