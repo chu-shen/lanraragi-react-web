@@ -1,5 +1,5 @@
 name: ratingAndcomment demo site
-on: push
+on: [push, workflow_dispatch]
 
 jobs:
   deploy:
