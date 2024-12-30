@@ -53,9 +53,7 @@ export const getCurrentArciveRandomArchivesIndex = createSelector(
   }
 );
 
-export const getCurrentPages = createSelector(getApp, (app) =>
-  [...app.pages].map((page) => page.replace(".", ""))
-);
+export const getCurrentPages = createSelector(getApp, (app) => [...app.pages]);
 
 export const getCurrentRenderedPages = createSelector(getApp, (app) => [
   ...app.renderedPages,
