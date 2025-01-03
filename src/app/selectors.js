@@ -10,21 +10,20 @@ const getApp = createSelector(getState, (state) => state.app);
 
 export const getCurrentArchiveId = createSelector(
   getApp,
-  (app) => `${app.currentArchiveId}`
+  (app) => `${app?.currentArchiveId ?? ""}`
 );
 
 export const getCurrentRandomArchives = createSelector(getApp, (app) => [
-  ...app.randomArchives,
+  ...(app?.randomArchives ?? []),
 ]);
 
-export const getCurrentSearchArchives = createSelector(
-  getApp,
-  (app) => [...app.searchArchives]
-);
+export const getCurrentSearchArchives = createSelector(getApp, (app) => [
+  ...(app?.searchArchives ?? []),
+]);
 
 export const getSearchArchivesTotal = createSelector(
   getApp,
-  (app) => app.searchArchivesTotal
+  (app) => app?.searchArchivesTotal ?? 0
 );
 
 export const getRandomAndSearchArchives = createSelector(
@@ -36,7 +35,7 @@ export const getRandomAndSearchArchives = createSelector(
 export const getCurrentArchiveFromRandomAndResults = createSelector(
   getCurrentArchiveId,
   getRandomAndSearchArchives,
-  (arcId, archives) => archives.find((arc) => arc.arcid === arcId) ?? {}
+  (arcId, archives) => archives.find((arc) => arc?.arcid === arcId) ?? {}
 );
 
 export const getAmountOfSearchArchives = createSelector(
@@ -53,19 +52,21 @@ export const getCurrentArciveRandomArchivesIndex = createSelector(
   }
 );
 
-export const getCurrentPages = createSelector(getApp, (app) => [...app.pages]);
+export const getCurrentPages = createSelector(getApp, (app) => [
+  ...(app?.pages ?? []),
+]);
 
 export const getCurrentRenderedPages = createSelector(getApp, (app) => [
-  ...app.renderedPages,
+  ...(app?.renderedPages ?? []),
 ]);
 
 export const getBaseUrlSelector = createSelector(
   getApp,
-  (app) => `${app.baseUrl}`
+  (app) => `${app?.baseUrl ?? ""}`
 );
 
 export const getSectionVisibilityObject = createSelector(getApp, (app) => ({
-  ...app.sectionVisibility,
+  ...(app?.sectionVisibility ?? {}),
 }));
 
 export const getVisibleSection = createSelector(
@@ -89,7 +90,7 @@ export const getSectionVisibilityObjectForSideNavbar = createSelector(
   getSectionVisibilityObject,
   (sectionVisibilityObject) => [
     ...Object.keys(sectionVisibilityObject)
-      .filter((s) => s !== "address")
+      .filter((section) => section !== "address")
       .map((section) => ({
         id: section,
         label: firstLetterToUppercase(section),
@@ -120,21 +121,22 @@ export const getSearchFilter = createSelector(
 export const getMaxPages = createSelector(
   getSearchArchivesTotal,
   (total) => (breakpoint) => {
+    const totalArchivesAmount = total ?? 0;
     const maxNum = getNumArchivesToRender();
-    const maxPageNumber = total / maxNum[breakpoint];
-    return total % maxNum[breakpoint] === 0
+    const maxPageNumber = totalArchivesAmount / maxNum[breakpoint];
+    return totalArchivesAmount % maxNum[breakpoint] === 0
       ? maxPageNumber
       : Math.ceil(maxPageNumber);
   }
 );
 
 export const getCategories = createSelector(getApp, (app) => [
-  ...app.categories,
+  ...(app?.categories ?? []),
 ]);
 
 export const getInfoDialogArchiveId = createSelector(
   getApp,
-  (app) => `${app?.infoDialogArchiveId}`
+  (app) => `${app?.infoDialogArchiveId ?? ""}`
 );
 
 export const getArchiveCategories = createSelector(
@@ -151,7 +153,7 @@ export const getArchiveCategories = createSelector(
 
 export const getDisplayNavbar = createSelector(
   getApp,
-  (app) => !!app.displayNavbar
+  (app) => !!app?.displayNavbar
 );
 
 export const getArchiveOpenedFrom = createSelector(
