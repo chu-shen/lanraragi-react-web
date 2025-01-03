@@ -9,7 +9,7 @@
   - Add tag:Rating
   - Add tag:Comment
 
-- Update Reading Progression
+- ~~Update Reading Progression~~ Upstream merged
   - **Only** Support Clear Archive New flag
 
 **Warning**
