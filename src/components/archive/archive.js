@@ -37,6 +37,8 @@ export const Archive = ({
   // TODO: 调整为可配置
   const language = tagsAsObject?.语言 ?? [];
 
+  const TranslateTitleByAI = tagsAsObject?.['TranslateTitleByAI'] ?? "";
+
   return (
     <Grid xs={1} sm={1} md={1} lg={1} xl={1} item>
       <Paper
@@ -67,8 +69,9 @@ export const Archive = ({
               ref={ref}
               href={`${httpOrHttps()}${baseUrl}/reader?id=${id}`}
               target="_blank"
+              rel="noreferrer"
             >
-              {title}
+              {TranslateTitleByAI ? TranslateTitleByAI : title}
             </a>
           </button>
         </div>
